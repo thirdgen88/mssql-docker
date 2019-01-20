@@ -25,7 +25,7 @@ This Docker image builds on the base [Microsoft SQL Server Linux Image][mssql-hu
 
 # Getting Started
 
-In order to run this image, you can follow the guidance listed in the [How to use this Image][mssql-hub] section of the Microsoft Docker Hub Page.  There are some additional environment variables exposed by the custom [entrypoint](2017/docker-entrypoint.sh) script that enable some enhanced functionality.  We'll take a look at some of those extended use-cases in this section.
+In order to run this image, you can follow the guidance listed in the [How to use this Image][mssql-hub] section of the Microsoft Docker Hub Page.  There are some additional environment variables exposed by the custom [entrypoint](https://github.com/thirdgen88/mssql-docker/blob/master/2017/docker-entrypoint.sh) script that enable some enhanced functionality.  We'll take a look at some of those extended use-cases in this section.
 
 ## Starting up with a new empty database
 
