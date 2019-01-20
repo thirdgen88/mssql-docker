@@ -83,7 +83,7 @@ The definition above has a few notable features:
 
 - The `db-init` bind-mount in the container allows you to place `.sql` or `.bak` files that will be processed on first-launch of the container.  Keep in mind that a `my_db.bak` file will be restored as database `[my_db]`, so pay attention to the `.bak` names you place here.  Any valid T-SQL files with a `.sql` extension will also be processed.
 
-- You can define a named volume against `/var/opt/mssql/data` in order to persist your data, per the [base guidance] from Microsoft.
+- You can define a named volume against `/var/opt/mssql` in order to persist your data, per the [base guidance] from Microsoft.
 
 ## Running the Docker Compose Service
 
