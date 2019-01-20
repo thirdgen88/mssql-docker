@@ -1,6 +1,6 @@
 # MSSQL for Linux under Docker with Extras 😎
 
-[![Build Status](https://travis-ci.org/thirdgen88/mssql-docker.svg?branch=master)](https://travis-ci.org/thirdgen88/mssql-docker)
+[![Build Status](https://travis-ci.com/thirdgen88/mssql-docker.svg?branch=master)](https://travis-ci.com/thirdgen88/mssql-docker)
 [![Docker Stars](https://img.shields.io/docker/stars/kcollins/mssql.svg)](https://hub.docker.com/r/kcollins/mssql)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kcollins/mssql.svg)](https://hub.docker.com/r/kcollins/mssql)
 
