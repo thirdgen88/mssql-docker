@@ -1,0 +1,38 @@
+version: '3.1'
+services:
+  db:
+    build:
+      context: ./2017
+      dockerfile: Dockerfile
+    image: kcollins/mssql:latest
+    ports:
+      - 1433:1433
+    volumes:
+      - db_data:/var/opt/mssql
+      - ./db-backups:/backups
+      - ./db-init:/docker-entrypoint-initdb.d
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    secrets:
+      - sa-password
+      - mssql-password
+    environment:
+      # ACCEPT_EULA confirms your acceptance of the End-User Licensing Agreement.
+      ACCEPT_EULA: Y
+      SA_PASSWORD_FILE: /run/secrets/sa-password
+      MSSQL_DATABASE: test
+      MSSQL_USER: testuser
+      MSSQL_PASSWORD_FILE: /run/secrets/mssql-password
+      MSSQL_PID: Developer  # Change to the edition you need, e.g. "Express", "Standard", etc.
+
+secrets:
+  sa-password:
+    file: ./secrets/SA_PASSWORD
+  mssql-password:
+    file: ./secrets/MSSQL_PASSWORD
+
+volumes:
+  db_data:
