@@ -1,5 +1,5 @@
 ARG MSSQL_UPSTREAM_TAG=2017-latest-ubuntu
-FROM mcr.microsoft.com/mssql/server:${MSSQL_UPSTREAM_TAG}}
+FROM mcr.microsoft.com/mssql/server:${MSSQL_UPSTREAM_TAG}
 LABEL maintainer "Kevin Collins <kcollins@purelinux.net>"
 
 # Install some additional prerequisites
