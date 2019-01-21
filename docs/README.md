@@ -32,13 +32,15 @@ In order to run this image, you can follow the guidance listed in the [How to us
 To start a container named `sql1` with a new empty database named `test`, use the following:
 
     $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=ch@nge_m3" \
-      -e "MSSQL_DATABASE=test" -e "MSSQL_USER=testuser" -e "MSSQL_PASSWORD=testpass" --name `sql1` kcollins/mssql:latest
+      -e "MSSQL_DATABASE=test" -e "MSSQL_USER=testuser" -e "MSSQL_PASSWORD=testpass" \
+      --name sql1 kcollins/mssql:latest
 
 ## Generating a random SA password
 
 You can also specify a random `sa` account password to be generated on startup and output to the console:
 
-    $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_RANDOM_SA_PASSWORD=Y" --name `sql1` kcollins/mssql:latest
+    $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_RANDOM_SA_PASSWORD=Y" \
+      --name sql1 kcollins/mssql:latest
 
 # Using Docker Compose
 
@@ -111,7 +113,7 @@ This image has built-in support for quick and easy backups.  Let's assume you ha
 
     $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_RANDOM_SA_PASSWORD=Y" \
       -e "MSSQL_DATABASE=my_database" -e "MSSQL_USER=user1" -e "MSSQL_PASSWORD=testpass" \
-      -v ${PWD}/db-backups:/backups --name `sql1` kcollins/mssql:latest
+      -v ${PWD}/db-backups:/backups --name sql1 kcollins/mssql:latest
 
 At this point, you can take a backup from your host with a simple `docker exec` statement:
 
