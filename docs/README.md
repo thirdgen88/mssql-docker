@@ -125,6 +125,23 @@ You can also specify the database to be backed up:
 
 In your `./db-backups` folder, you'll have a nicely named file such as `my_database_20190120_044511.bak`.  You can specify a `RETAIN_FILES_COUNT=n` environment variable, where _n_ is the number of backup files to retain in the `/backups` folder in the container.  This can be helpful if you setup a cron task to periodically call the `backup.sh` script on a schedule.
 
+# Environment Variable Reference
+
+Like described in some of the examples above, you can customize the start-up behavior of database container by specifying the following additional environment variables (see also the built-in ones from the [base image](https://hub.docker.com/r/microsoft/mssql-server)):
+
+_Table 1 - Environment Variables_
+
+Variable                           | Default | Description                                                            |
+---------------------------------- | ------- | ---------------------------------------------------------------------- |
+`MSSQL_DATABASE`                   |         | Name of database to be created on initial startup                      |
+`MSSQL_USER`                       |         | Username that will be created and given `db_owner` to _MSSQL_DATABASE_ |
+`MSSQL_PASSWORD`                   |         | Password for the _MSSQL_USER_                                          |
+`MSSQL_STARTUP_DELAY`              | `60`    | Duration in seconds to wait for initial startup provisioning           |
+
+Note that the `MSSQL_USER` and `MSSQL_PASSWORD` variables can also be specified with a `_FILE` suffix if the variable contains a path to a file in the container with a single line value for the variable.  This is helpful when used in conjunction with [Docker Secrets](https://docs.docker.com/engine/reference/commandline/secret/).
+
+In order to have the image provision a new empty database, you must specify all of `MSSQL_DATABASE`, `MSSQL_USER`, and `MSSQL_PASSWORD`.
+
 # References
 
 There is a lot of useful information over at the [Microsoft Docs](https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-2017) page for working with the MSSQL Docker Image.  Take a look at that for more detailed information about managing the container and performing other administrative tasks.
