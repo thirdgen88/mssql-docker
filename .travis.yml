@@ -6,7 +6,7 @@ env:
     - IMAGE_NAME=kcollins/mssql
   matrix:
     - MAJOR=2017 UPSTREAM_TAG=2017-latest-ubuntu LATEST=1
-    # - MAJOR=2019 UPSTREAM_TAG=2019-CTP2.2-ubuntu
+    - MAJOR=2019 UPSTREAM_TAG=2019-GA-ubuntu-16.04
 
 before_script:
   - cd "$MAJOR"

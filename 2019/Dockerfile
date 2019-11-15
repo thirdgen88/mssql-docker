@@ -1,8 +1,9 @@
-ARG MSSQL_UPSTREAM_TAG=2017-latest-ubuntu
+ARG MSSQL_UPSTREAM_TAG=2019-GA-ubuntu-16.04
 FROM mcr.microsoft.com/mssql/server:${MSSQL_UPSTREAM_TAG}
 LABEL maintainer "Kevin Collins <kcollins@purelinux.net>"
 
 # Install some additional prerequisites
+USER root
 RUN apt-get update && \
     apt-get install -y gettext pwgen
 
@@ -25,8 +26,13 @@ ENV PATH /opt/mssql-tools/bin:$PATH
 
 # Create some base paths and place our provisioning script
 RUN mkdir /docker-entrypoint-initdb.d && \
+    chown mssql:root /docker-entrypoint-initdb.d && \
     mkdir /backups && \
+    chown mssql:root /backups && \
     mkdir -p /var/opt/mssql
+
+# Return to mssql user
+USER mssql
 
 # Run SQL Server process.
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
