@@ -1,7 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-* [`2017`, `2017-latest-ubuntu`, `latest` (2017/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2017/Dockerfile)
-* [`2019`, `2019-GA-ubuntu-16.04`, (2019/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2019/Dockerfile)
+* [`2017`, `2017-latest-ubuntu` (2017/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2017/Dockerfile)
+* [`2019`, `2019-latest`, `latest` (2019/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2019/Dockerfile)
 
 # Quick Reference
 
