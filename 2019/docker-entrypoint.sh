@@ -87,7 +87,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
     fi
 
     # Set SQLCMD command string for additional initialization file processing
-    sqlcmd=( sqlcmd -S localhost -U sa -l 3 -t 3 -V 16 )
+    sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 )
 
     echo
     ls /docker-entrypoint-initdb.d/ > /dev/null
