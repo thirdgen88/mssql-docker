@@ -1,17 +1,18 @@
-ARG MSSQL_UPSTREAM_TAG=2019-GA-ubuntu-16.04
+ARG MSSQL_UPSTREAM_TAG=2019-CU8-ubuntu-16.04
 FROM mcr.microsoft.com/mssql/server:${MSSQL_UPSTREAM_TAG}
-LABEL maintainer "Kevin Collins <kcollins@purelinux.net>"
+LABEL maintainer="Kevin Collins <kcollins@purelinux.net>"
 
 # Install some additional prerequisites
 USER root
 RUN apt-get update && \
-    apt-get install -y gettext pwgen
+    apt-get install -y gettext pwgen nano
 
 # Copy in scripts
 COPY docker-entrypoint.sh /
-COPY setup.sql /var/opt/mssql/
+COPY setup.sql /
 COPY healthcheck.sh /
 COPY backup.sh /
+COPY restore.sh /
 
 # Set a Simple Health Check
 HEALTHCHECK \
