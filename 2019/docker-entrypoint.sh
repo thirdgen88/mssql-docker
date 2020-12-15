@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "DOCKER-ENTRYPOINT: Start!"
 set -eo pipefail
 shopt -s nullglob
 
@@ -18,7 +19,7 @@ file_env() {
 	if [ "${!var:-}" ]; then
 		val="${!var}"
 	elif [ "${!fileVar:-}" ]; then
-		val="$(< "${!fileVar}")"
+		val="$(head -n 1 "${!fileVar}")"
 	fi
 	export "$var"="$val"
 	unset "$fileVar"
@@ -42,51 +43,55 @@ process_init_file() {
 	echo
 }
 
+
 MSSQL_BASE=${MSSQL_BASE:-/var/opt/mssql}
-MSSQL_PROVISIONING_FILE_TEMPLATE=${MSSQL_BASE}/setup.sql
+MSSQL_PROVISIONING_FILE_TEMPLATE=/setup.sql
 MSSQL_PROVISIONING_FILE=${MSSQL_BASE}/setup-temp.sql
 
-# Collect SQL Product Edition
+echo "DOCKER-ENTRYPOINT: Collect SQL Product Edition"
 file_env 'MSSQL_PID' 'Developer'
 
-# Check for Init Complete
+echo "DOCKER-ENTRYPOINT: Check for Init Complete!"
 if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
-    # Mark Initialization Complete
+    echo "DOCKER-ENTRYPOINT: Mark Initialization Complete!"
     mkdir -p ${MSSQL_BASE}
     touch ${MSSQL_BASE}/.docker-init-complete
 
-    # Check some critical environment variables
+    echo "DOCKER-ENTRYPOINT: Check some critical environment variables"
+    echo "DOCKER-ENTRYPOINT: SA_PASSWORD_FILE: $SA_PASSWORD_FILE"
     file_env 'SA_PASSWORD'
+    echo "DOCKER-ENTRYPOINT: Setting password for SA user"
     if [ -z "${SA_PASSWORD}" -a -z "${MSSQL_RANDOM_SA_PASSWORD}" ]; then
-        echo >&2 "ERROR: Database initialization aborted, you must specify either SA_PASSWORD or MSSQL_RANDOM_SA_PASSWORD"
+        echo >&2 "DOCKER-ENTRYPOINT: ERROR: Database initialization aborted, you must specify either SA_PASSWORD or MSSQL_RANDOM_SA_PASSWORD"
         exit 1
     else
 		if [ ! -z "$MSSQL_RANDOM_SA_PASSWORD" ]; then
+      echo "DOCKER-ENTRYPOINT: Generating random password for SA"
 			export SA_PASSWORD="$(pwgen -1 32)"
-			echo "GENERATED SA PASSWORD: $SA_PASSWORD"
+			echo "DOCKER-ENTRYPOINT: GENERATED SA PASSWORD: $SA_PASSWORD"
 		fi
         export SQLCMDPASSWORD=$SA_PASSWORD
     fi
 
-    # Initialize MSSQL before attempting database creation
+    echo "DOCKER-ENTRYPOINT: Initialize MSSQL before attempting database creation"
     "$@" &
     pid="$!"
 
-    # Wait up to 60 seconds for database initialization to complete
+    echo "DOCKER-ENTRYPOINT: Wait up to 60 seconds for database initialization to complete"
     echo "Database Startup In Progress..."
     for ((i=${MSSQL_STARTUP_DELAY:=60};i>0;i--)); do
         if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 1 -t 1 -V 16 -Q "SELECT 1" &> /dev/null; then
-            echo "Database healthy, proceeding with provisioning..."
+            echo "DOCKER-ENTRYPOINT: Database healthy, proceeding with provisioning..."
             break
         fi
         sleep 1
     done
     if [ "$i" -le 0 ]; then
-        echo >&2 "Database initialization process failed after ${MSSQL_STARTUP_DELAY} delay."
+        echo >&2 "DOCKER-ENTRYPOINT: Database initialization process failed after ${MSSQL_STARTUP_DELAY} delay."
         exit 1
     fi
 
-    # Set SQLCMD command string for additional initialization file processing
+    echo "DOCKER-ENTRYPOINT: Set SQLCMD command string for additional initialization file processing"
     sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 )
 
     echo
@@ -95,9 +100,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
         process_init_file "$f" "${sqlcmd[@]}"
     done
 
-    # Run the provisioning action
-    file_env 'MSSQL_DATABASE'
-    file_env 'MSSQL_USER'
+    echo "DOCKER-ENTRYPOINT: Run the provisioning action"
     file_env 'MSSQL_PASSWORD'
     if [ "${MSSQL_DATABASE}" -a "${MSSQL_USER}" -a "${MSSQL_PASSWORD}" ]; then
         envsubst < "${MSSQL_PROVISIONING_FILE_TEMPLATE}" > "${MSSQL_PROVISIONING_FILE}"
@@ -115,9 +118,11 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
 
     echo "Startup Complete."
 
-    # Attach and wait for exit
+    echo "DOCKER-ENTRYPOINT: Attach and wait for exit"
     wait "$pid"
 else
     exec "$@"
 fi
+
+echo "DOCKER-ENTRYPOINT: Completed!"
 
