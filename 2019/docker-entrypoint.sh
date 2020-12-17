@@ -77,7 +77,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
     "$@" &
     pid="$!"
 
-    echo "DOCKER-ENTRYPOINT: Wait up to 60 seconds for database initialization to complete"
+    echo "DOCKER-ENTRYPOINT: Wait up to ${MSSQL_STARTUP_DELAY:=60} seconds for database initialization to complete"
     echo "Database Startup In Progress..."
     for ((i=${MSSQL_STARTUP_DELAY:=60};i>0;i--)); do
         if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 1 -t 1 -V 16 -Q "SELECT 1" &> /dev/null; then
