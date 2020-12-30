@@ -12,7 +12,7 @@ file_env() {
 	local fileVar="${var}_FILE"
 	local def="${2:-}"
 	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+		echo >&2 "DOCKER-ENTRYPOINT: error: both $var and $fileVar are set (but are exclusive)"
 		exit 1
 	fi
 	local val="$def"
@@ -35,10 +35,10 @@ process_init_file() {
 	local sqlcmd=( "$@" )
 
 	case "$f" in
-		*.sh)     echo "$0: running $f"; . "$f" ;;
-		*.sql)    echo "$0: running $f"; "${sqlcmd[@]}" -i "$f"; echo ;;
-        *.bak)    echo "$0: restoring $f"; "${sqlcmd[@]}" -Q "RESTORE DATABASE [$(basename ${f/.bak/})] FROM DISK='$f'"; echo ;;
-		*)        echo "$0: ignoring $f" ;;
+		*.sh)     echo "DOCKER-ENTRYPOINT: $0: running $f"; . "$f" ;;
+		*.sql)    echo "DOCKER-ENTRYPOINT: $0: running $f"; "${sqlcmd[@]}" -i "$f"; echo ;;
+        *.bak)    echo "DOCKER-ENTRYPOINT: $0: restoring $f"; "${sqlcmd[@]}" -Q "RESTORE DATABASE [$(basename ${f/.bak/})] FROM DISK='$f'"; echo ;;
+		*)        echo "DOCKER-ENTRYPOINT: $0: ignoring $f" ;;
 	esac
 	echo
 }
@@ -77,8 +77,8 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
     "$@" &
     pid="$!"
 
-    echo "DOCKER-ENTRYPOINT: Wait up to 60 seconds for database initialization to complete"
-    echo "Database Startup In Progress..."
+    echo "DOCKER-ENTRYPOINT: Wait up to ${MSSQL_STARTUP_DELAY:=60} seconds for database initialization to complete"
+    echo "DOCKER-ENTRYPOINT: Database Startup In Progress..."
     for ((i=${MSSQL_STARTUP_DELAY:=60};i>0;i--)); do
         if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 1 -t 1 -V 16 -Q "SELECT 1" &> /dev/null; then
             echo "DOCKER-ENTRYPOINT: Database healthy, proceeding with provisioning..."
@@ -106,21 +106,22 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
         envsubst < "${MSSQL_PROVISIONING_FILE_TEMPLATE}" > "${MSSQL_PROVISIONING_FILE}"
         /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -b -m 16 -V 16 -i ${MSSQL_PROVISIONING_FILE}
         if [ $? -eq 0 ]; then
-            echo "Provisioning completed, database [${MSSQL_DATABASE}] created."
+            echo "DOCKER-ENTRYPOINT: Provisioning completed, database [${MSSQL_DATABASE}] created."
             rm ${MSSQL_PROVISIONING_FILE}
         else
-            echo >&2 "Failed to provision database."
+            echo >&2 "DOCKER-ENTRYPOINT: Failed to provision database."
             exit 1
         fi
     else
-        echo "Provisioning parameters not specified, skipping..."
+        echo "DOCKER-ENTRYPOINT: Provisioning parameters not specified, skipping..."
     fi
 
-    echo "Startup Complete."
+    echo "DOCKER-ENTRYPOINT: Startup Complete."
 
     echo "DOCKER-ENTRYPOINT: Attach and wait for exit"
     wait "$pid"
 else
+    echo "DOCKER-ENTRYPOINT: MS SQL Server initialization already done. Simply starting the server!"
     exec "$@"
 fi
 
