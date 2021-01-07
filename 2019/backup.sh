@@ -21,6 +21,9 @@ BACKUP_FILE="${BACKUP_TARGET}/${BACKUP_FILE_NAME}"
 echo "BACKUP: Initiating backup of database [${DATABASE_TARGET}] to ${BACKUP_FILE}"
 /opt/mssql-tools/bin/sqlcmd \
   -S localhost -U sa \
+  -Q "ALTER DATABASE [${DATABASE_TARGET}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;"
+/opt/mssql-tools/bin/sqlcmd \
+  -S localhost -U sa \
   -Q "BACKUP DATABASE [${DATABASE_TARGET}] TO DISK = N'${BACKUP_FILE}' WITH NOFORMAT, NOINIT, NAME = '${DATABASE_TARGET}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 
 chmod 640 ${BACKUP_FILE}
