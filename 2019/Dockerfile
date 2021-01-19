@@ -14,6 +14,7 @@ COPY healthcheck.sh /
 COPY backup.sh /
 COPY restore.sh /
 COPY publish-backup-to-s3.sh /
+COPY restore-from-s3.sh /
 
 # Set a Simple Health Check
 HEALTHCHECK \
@@ -33,7 +34,9 @@ RUN mkdir /docker-entrypoint-initdb.d && \
     chown mssql:root /backups && \
     mkdir -p /var/opt/mssql && \
     chown mssql:root /publish-backup-to-s3.sh && \
-    chmod u+x /publish-backup-to-s3.sh
+    chmod u+x /publish-backup-to-s3.sh && \
+    chown mssql:root /restore-from-s3.sh && \
+    chmod u+x /restore-from-s3.sh
 
 # Return to mssql user
 USER mssql
