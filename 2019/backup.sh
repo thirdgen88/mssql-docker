@@ -35,4 +35,11 @@ else
   fi
 fi
 
-echo "BACKUP: Backup procedure completed!"
+if /publish-backup-to-s3.sh "$BACKUP_FILE" ; then
+  echo "BACKUP: Backup procedure completed!"
+  exit 0
+else
+  echo "BACKUP: Backup procedure failed!"
+  exit 1
+fi
+

@@ -5,7 +5,7 @@ LABEL maintainer="Kevin Collins <kcollins@purelinux.net>"
 # Install some additional prerequisites
 USER root
 RUN apt-get update && \
-    apt-get install -y gettext pwgen nano
+    apt-get install -y gettext pwgen nano awscli
 
 # Copy in scripts
 COPY docker-entrypoint.sh /
@@ -13,6 +13,7 @@ COPY setup.sql /
 COPY healthcheck.sh /
 COPY backup.sh /
 COPY restore.sh /
+COPY publish-backup-to-s3.sh /
 
 # Set a Simple Health Check
 HEALTHCHECK \
@@ -30,7 +31,9 @@ RUN mkdir /docker-entrypoint-initdb.d && \
     chown mssql:root /docker-entrypoint-initdb.d && \
     mkdir /backups && \
     chown mssql:root /backups && \
-    mkdir -p /var/opt/mssql
+    mkdir -p /var/opt/mssql && \
+    chown mssql:root /publish-backup-to-s3.sh && \
+    chmod u+x /publish-backup-to-s3.sh
 
 # Return to mssql user
 USER mssql
