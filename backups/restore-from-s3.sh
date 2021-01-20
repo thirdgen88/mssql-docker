@@ -36,9 +36,9 @@ RESTORE_RESULT=$?
 
 echo
 if [ $RESTORE_RESULT -eq 0 ]; then
-  echo "AWS-S3: Restoring backup s3://$AWS_S3_BUCKET_NAME/$BACKUP_FILE_NAME - DONE"
+  echo "AWS-S3: Restoring backup - DONE s3://$AWS_S3_BUCKET_NAME/$BACKUP_FILE_NAME"
   exit 0
 else
-  echo "AWS-S3: Restoring backup s3://$AWS_S3_BUCKET_NAME/$BACKUP_FILE_NAME - FAILED"
+  echo "AWS-S3: Restoring backup - FAILED s3://$AWS_S3_BUCKET_NAME/$BACKUP_FILE_NAME"
   exit 1
 fi
