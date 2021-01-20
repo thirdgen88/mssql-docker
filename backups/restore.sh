@@ -19,7 +19,7 @@ LATEST_BACKUP_FILE=$(find $BACKUP_TARGET | sort | tail -n 1)
 if [ -z "$BACKUP_LABEL" ]; then
   BACKUP_TO_RESTORE=$LATEST_BACKUP_FILE
 else
-  BACKUP_TO_RESTORE=$(find "$BACKUP_TARGET/*$BACKUP_LABEL" | sort | tail -n 1)
+  BACKUP_TO_RESTORE=$(find $BACKUP_TARGET/*${BACKUP_LABEL} | sort | tail -n 1)
 fi
 
 # Perform Database Restore
