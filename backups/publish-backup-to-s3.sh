@@ -37,11 +37,11 @@ aws s3 ls "s3://$AWS_S3_BUCKET_NAME"
 
 echo
 if [ $PUBLICATION_RESULT -eq 0 ]; then
-  echo "AWS-S3: Publishing backup $AWS_S3_BACKUP_FILE_PATH to s3://$AWS_S3_BUCKET_NAME - DONE"
+  echo "AWS-S3: Publishing backup - DONE $AWS_S3_BACKUP_FILE_PATH to s3://$AWS_S3_BUCKET_NAME"
   echo
   exit 0
 else
-  echo "AWS-S3: Publishing backup $AWS_S3_BACKUP_FILE_PATH to s3://$AWS_S3_BUCKET_NAME - FAILED"
+  echo "AWS-S3: Publishing backup - FAILED $AWS_S3_BACKUP_FILE_PATH to s3://$AWS_S3_BUCKET_NAME"
   echo
   exit 1
 fi

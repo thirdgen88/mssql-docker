@@ -29,10 +29,6 @@ sqlcmd \
   -S "$MSSQL_HOSTNAME" -U sa \
   -Q "BACKUP DATABASE [${DATABASE_TARGET}] TO DISK = N'${BACKUP_FILE}' WITH NOFORMAT, NOINIT, NAME = '${DATABASE_TARGET}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 
-sqlcmd \
-  -S "msserver-unvr" -U sa \
-  -Q "BACKUP DATABASE [DigitalPlatformsAlpha] TO DISK = N'/backups/DigitalPlatformsAlpha_20210120_145717' WITH NOFORMAT, NOINIT, NAME = 'DigitalPlatformsAlpha-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
-
 chmod 640 ${BACKUP_FILE}
 
 if [ -z ${RETAIN_FILES_COUNT} ]; then
