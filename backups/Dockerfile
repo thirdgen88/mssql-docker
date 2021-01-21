@@ -5,15 +5,14 @@ RUN apt-get update && \
     apt-get install -y nano awscli cron
 
 COPY backup.sh /
+COPY backup-daily.sh /
 COPY restore.sh /
 COPY publish-backup-to-s3.sh /
 COPY restore-from-s3.sh /
-COPY backup-cron.sh /
+COPY entrypoint.sh /
+
+RUN chmod +x /backup.sh /backup-daily.sh /restore.sh /publish-backup-to-s3.sh /restore-from-s3.sh /entrypoint.sh
 
 RUN mkdir /backups
 
-COPY backup-cron /etc/cron.d/backup-cron
-
-RUN touch /var/log/cron.log
-
-CMD [ "cron", "&&", "tail", "-f", "/var/log/cron.log" ]
+ENTRYPOINT ["/entrypoint.sh"]

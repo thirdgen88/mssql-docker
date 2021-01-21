@@ -3,8 +3,6 @@ set -eo pipefail
 
 echo "BACKUP: Backup procedure started!"
 
-export SQLCMDPASSWORD=${SA_PASSWORD:-$(<${SA_PASSWORD_FILE})}
-
 if [ -z "$MSSQL_HOSTNAME" ]; then
   echo "BACKUP: You have to pass MS SQL hostname as environment variable 'MSSQL_HOSTNAME'"
   exit 1
@@ -16,6 +14,8 @@ if [ -z "${MSSQL_DATABASE}" -a -z "$1" ]; then
   exit 1
 fi
 
+export SQLCMDPASSWORD=${SA_PASSWORD:-$(<${SA_PASSWORD_FILE})}
+
 # Set Targets
 DATABASE_TARGET=${1:-${MSSQL_DATABASE}} # Prioritize first argument, fall back to env variable
 BACKUP_TARGET=/backups
@@ -25,7 +25,7 @@ BACKUP_FILE_NAME=${DEFAULT_BACKUP_FILE_NAME}_$LABEL
 BACKUP_FILE="${BACKUP_TARGET}/${BACKUP_FILE_NAME}"
 
 echo "BACKUP: Initiating backup of database [${DATABASE_TARGET}] to ${BACKUP_FILE}"
-sqlcmd \
+/opt/mssql-tools/bin/sqlcmd \
   -S "$MSSQL_HOSTNAME" -U sa \
   -Q "BACKUP DATABASE [${DATABASE_TARGET}] TO DISK = N'${BACKUP_FILE}' WITH NOFORMAT, NOINIT, NAME = '${DATABASE_TARGET}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 

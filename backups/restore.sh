@@ -24,7 +24,7 @@ fi
 
 # Perform Database Restore
 echo "Initiating restore of database [${DATABASE_TARGET}] from ${BACKUP_TO_RESTORE}"
-sqlcmd \
+/opt/mssql-tools/bin/sqlcmd \
   -S "$MSSQL_HOSTNAME" -U sa \
   -Q "ALTER DATABASE [${DATABASE_TARGET}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
       RESTORE DATABASE [${DATABASE_TARGET}] FROM DISK = N'${BACKUP_TO_RESTORE}' WITH REPLACE;
