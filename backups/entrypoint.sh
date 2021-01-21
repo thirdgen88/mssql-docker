@@ -10,12 +10,8 @@ declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /contai
 # Setup a cron schedule
 echo "SHELL=/bin/bash
 BASH_ENV=/container.env
-$CRON_SCHEDULE /backup-periodically.sh >> /var/log/cron.log 2>&1
+$CRON_SCHEDULE /backup-periodically.sh > /proc/1/fd/1 2>/proc/1/fd/2
 # This extra line makes it a valid cron" > scheduler.txt
 
-touch /var/log/cron.log
-
 crontab scheduler.txt
-cron
-
-tail -f /var/log/cron.log
+cron -f
