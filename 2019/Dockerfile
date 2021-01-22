@@ -12,7 +12,6 @@ COPY docker-entrypoint.sh /
 COPY setup.sql /
 COPY healthcheck.sh /
 COPY backup.sh /
-COPY restore.sh /
 
 # Set a Simple Health Check
 HEALTHCHECK \
