@@ -8,7 +8,7 @@ fi
 
 echo "BACKUPS: Starting periodic backup."
 
-if /backup.sh; then
+if /backup.sh "" periodic; then
   echo "BACKUPS: Periodic backup completed!"
   exit 0
 else
