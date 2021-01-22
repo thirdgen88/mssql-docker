@@ -21,13 +21,16 @@ Table of Contents
     * [Running the Docker Compose Service](#running-the-docker-compose-service)
 * [Backing up your database](#backing-up-your-database)
 * [Environment Variable Reference](#environment-variable-reference)
+* [Dedicated backup container](#dedicated-backup-container)
 * [References](#references)
 * [License](#license)
+
 
 # Supported tags and respective `Dockerfile` links
 
 * [`2017`, `2017-latest-ubuntu` (2017/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2017/Dockerfile)
 * [`2019`, `2019-latest`, `latest` (2019/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2019/Dockerfile)
+* []
 
 # Quick Reference
 
@@ -195,18 +198,18 @@ conjunction with [Docker Secrets](https://docs.docker.com/engine/reference/comma
 In order to have the image provision a new empty database, you must specify all of `MSSQL_DATABASE`, `MSSQL_USER`,
 and `MSSQL_PASSWORD`.
 
-# Special backup container
+# Dedicated backup container
 
-As an addition to extended MS SQL image, there is special backup image that can be used together with the MS SQL image
-to perform maintenance tasks:
+As an addition to extended MS SQL image, there is a dedicated backup image that can be used together with the MS SQL
+image to perform maintenance tasks:
 
 1. backups
-    * on-demand using: /backup.sh script: `/backup.sh`
-    * on-demand adding label (defaults to `latest`) to a backup file: `/backup.sh database-name-to-backup label`
+    * on-demand using: /backup.sh script: `/backup.sh database-name`
+    * on-demand adding label (defaults to `latest`) to a backup file: `/backup.sh database-name label`
 2. uploading backups to
    a [S3 bucket configured via env variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html):
-    * AWS_CONFIG_FILE - path to the AWSCLI configuration file
-    * AWS_SHARED_CREDENTIALS_FILE - path to the AWSCLI credentials file
+    * AWS_CONFIG_FILE - path to the AWS-CLI configuration file
+    * AWS_SHARED_CREDENTIALS_FILE - path to the AWS-CLI credentials file
     * AWS_S3_SSE_CUSTOMER_KEY - path to the customer key for SSE encryption of backups
     * AWS_S3_BUCKET_NAME - S3 bucket name
 3. periodical backups scheduled using cron:
@@ -215,8 +218,15 @@ to perform maintenance tasks:
       at midnight)
 4. restores
     * on-demand using: /restore.sh script - restores the latest backup
-    * on-demand from the latest labeled backup, e.g.: `/restore.sh "" 0.0.1` will restore the latest backup with `0.0.1`
+    * on-demand from the latest labeled backup, e.g.: `/restore.sh database-name 0.0.1` will restore the latest backup
+      with `0.0.1`
       label; it is also supported to pass the full backup name instead of a label
+5. restores directly from S3 bucket: `/restore-from-s3.sh database-name backup-name`
+
+**Please notice:** In all enumerated cases `database-name` can be omitted (if used as the last parameter) or passed as
+empty string `/backup.sh "" label` (if used as middle parameter) and this will default to `MSSQL_DATABASE` variable.
+
+Sample compose file with configured MS SQL Server and DB Backup container - tested against Docker Swarm: [docker-compose-db-backup.yml](docker-compose-db-backup.yml)
 
 # References
 
