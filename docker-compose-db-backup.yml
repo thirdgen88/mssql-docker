@@ -1,0 +1,84 @@
+version: "3.8"
+services:
+  db-backups:
+    image: "mierzwid/mssql-backups:0.1.6"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    environment:
+      - MSSQL_HOSTNAME=mssql
+      - SA_PASSWORD_FILE=/run/secrets/sa_password.file
+      - MSSQL_DATABASE=DatabaseName
+      - RETAIN_FILES_COUNT=30
+      - ENABLE_PERIODIC_BACKUPS=y
+      - AWS_CONFIG_FILE=/run/secrets/mssql_aws-config
+      - AWS_SHARED_CREDENTIALS_FILE=/run/secrets/mssql_aws-credentials
+      - AWS_S3_SSE_CUSTOMER_KEY=/run/secrets/mssql_sse-customer-key
+      - AWS_S3_BUCKET_NAME=s3-backups-bucket-name
+    secrets:
+      - sa_password.file
+      - mssql_aws-config
+      - mssql_aws-credentials
+      - mssql_sse-customer-key
+    volumes:
+      - type: volume
+        source: backups
+        target: /backups
+    networks:
+      - network
+  mssql:
+    image: "mierzwid/mssql:2019-CU8-ubuntu-16.04-0.1.0"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 2048M
+    ports:
+      - '1433:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD_FILE=/run/secrets/sa_password.file
+      - MSSQL_DATABASE=DatabaseName
+      - MSSQL_USER=DatabaseUser
+      - MSSQL_PASSWORD_FILE=/run/secrets/mssql_password.file
+      - MSSQL_PID=Developer
+      - MSSQL_STARTUP_DELAY=120
+    volumes:
+      - type: volume
+        source: data
+        target: /var/opt/mssql
+      - type: volume
+        source: backups
+        target: /backups
+    secrets:
+      - sa_password.file
+      - mssql_password.file
+    networks:
+      - network
+    logging:
+      driver: json-file
+      options:
+        "max-size": "10m"
+        "max-file": "10"
+secrets:
+  sa_password.file:
+    file: ./secrets/msserver-unvr/sa_password.file
+  mssql_password.file:
+    file: ./secrets/msserver-unvr/mssql_password.file
+  mssql_aws-config:
+    file: ./secrets/msserver-unvr/mssql_aws-config
+  mssql_aws-credentials:
+    file: ./secrets/msserver-unvr/mssql_aws-credentials
+  mssql_sse-customer-key:
+    file: ./secrets/msserver-unvr/mssql_sse-customer-key
+networks:
+  network:
+    driver: overlay
+    attachable: true
+volumes:
+  data:
+  backups:
