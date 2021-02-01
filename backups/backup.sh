@@ -49,7 +49,10 @@ else
   fi
 fi
 
-if /publish-backup-to-s3.sh "$BACKUP_FILE"; then
+/publish-backup-to-s3.sh "$BACKUP_FILE"
+PUBLICATION_RESULT=$?
+
+if [ $PUBLICATION_RESULT -eq 0 ]; then
   echo "BACKUP: Backup procedure completed!"
   exit 0
 else
