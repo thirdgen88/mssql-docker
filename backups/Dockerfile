@@ -13,7 +13,8 @@ COPY entrypoint.sh /
 
 RUN chmod +x /backup.sh /backup-periodically.sh /restore.sh /publish-backup-to-s3.sh /restore-from-s3.sh /entrypoint.sh
 
-RUN adduser --disabled-password --gecos "user to share backups" mssql
+# to match uid & gid from the MS SQL image and share volume between containers
+RUN adduser --disabled-password --gecos "user to share backups" --gid 0 --uid 10001 mssql
 RUN mkdir /backups && \
     chown mssql:root /backups
 

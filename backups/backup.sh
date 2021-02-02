@@ -29,6 +29,14 @@ echo "BACKUP: Initiating backup of database [${DATABASE_TARGET}] to ${BACKUP_FIL
   -S "$MSSQL_HOSTNAME" -U sa \
   -Q "BACKUP DATABASE [${DATABASE_TARGET}] TO DISK = N'${BACKUP_FILE}' WITH NOFORMAT, NOINIT, NAME = '${DATABASE_TARGET}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 
+BACKUP_RESULT=$?
+
+if [ $BACKUP_RESULT -ne 0 ]; then
+  echo "BACKUP: Backup procedure failed!"
+  echo
+  exit 1
+fi
+
 chmod 640 ${BACKUP_FILE}
 
 if [ -z ${RETAIN_FILES_COUNT} ]; then
@@ -41,11 +49,13 @@ else
   fi
 fi
 
-if /publish-backup-to-s3.sh "$BACKUP_FILE" ; then
+/publish-backup-to-s3.sh "$BACKUP_FILE"
+PUBLICATION_RESULT=$?
+
+if [ $PUBLICATION_RESULT -eq 0 ]; then
   echo "BACKUP: Backup procedure completed!"
   exit 0
 else
   echo "BACKUP: Backup procedure failed!"
   exit 1
 fi
-
