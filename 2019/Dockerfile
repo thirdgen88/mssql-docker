@@ -36,4 +36,3 @@ USER mssql
 
 # Run SQL Server process.
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-CMD [ "/opt/mssql/bin/sqlservr" ]

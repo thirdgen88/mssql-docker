@@ -25,25 +25,6 @@ file_env() {
 	unset "$fileVar"
 }
 
-# usage: process_init_file FILENAME SQLCMD...
-#    ie: process_init_file foo.sh sqlcmd -S localhost -u sa
-# (process a single initializer file, based on its extension. we define this
-# function here, so that initializer scripts (*.sh) can use the same logic,
-# potentially recursively, or override the logic used in subsequent calls)
-process_init_file() {
-	local f="$1"; shift
-	local sqlcmd=( "$@" )
-
-	case "$f" in
-		*.sh)     echo "DOCKER-ENTRYPOINT: $0: running $f"; . "$f" ;;
-		*.sql)    echo "DOCKER-ENTRYPOINT: $0: running $f"; "${sqlcmd[@]}" -i "$f"; echo ;;
-        *.bak)    echo "DOCKER-ENTRYPOINT: $0: restoring $f"; "${sqlcmd[@]}" -Q "RESTORE DATABASE [$(basename ${f/.bak/})] FROM DISK='$f'"; echo ;;
-		*)        echo "DOCKER-ENTRYPOINT: $0: ignoring $f" ;;
-	esac
-	echo
-}
-
-
 MSSQL_BASE=${MSSQL_BASE:-/var/opt/mssql}
 MSSQL_PROVISIONING_FILE_TEMPLATE=/setup.sql
 MSSQL_PROVISIONING_FILE=${MSSQL_BASE}/setup-temp.sql
@@ -73,8 +54,9 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
         export SQLCMDPASSWORD=$SA_PASSWORD
     fi
 
-    echo "DOCKER-ENTRYPOINT: Initialize MSSQL before attempting database creation"
-    "$@" &
+    echo "DOCKER-ENTRYPOINT: Initialize MSSQL before attempting database creation: /opt/mssql/bin/sqlservr"
+
+    /opt/mssql/bin/sqlservr &
     pid="$!"
 
     echo "DOCKER-ENTRYPOINT: Wait up to ${MSSQL_STARTUP_DELAY:=60} seconds for database initialization to complete"
@@ -84,21 +66,13 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
             echo "DOCKER-ENTRYPOINT: Database healthy, proceeding with provisioning..."
             break
         fi
+        echo "DOCKER-ENTRYPOINT: Waiting for DB to start [$i/${MSSQL_STARTUP_DELAY}]"
         sleep 1
     done
     if [ "$i" -le 0 ]; then
         echo >&2 "DOCKER-ENTRYPOINT: Database initialization process failed after ${MSSQL_STARTUP_DELAY} delay."
         exit 1
     fi
-
-    echo "DOCKER-ENTRYPOINT: Set SQLCMD command string for additional initialization file processing"
-    sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 )
-
-    echo
-    ls /docker-entrypoint-initdb.d/ > /dev/null
-    for f in /docker-entrypoint-initdb.d/*.bak /docker-entrypoint-initdb.d/*.sh /docker-entrypoint-initdb.d/*.sql; do
-        process_init_file "$f" "${sqlcmd[@]}"
-    done
 
     echo "DOCKER-ENTRYPOINT: Run the provisioning action"
     file_env 'MSSQL_PASSWORD'
@@ -116,13 +90,22 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
         echo "DOCKER-ENTRYPOINT: Provisioning parameters not specified, skipping..."
     fi
 
+    echo
+    ls /docker-entrypoint-initdb.d/ > /dev/null
+    for f in /docker-entrypoint-initdb.d/*.sql; do
+        echo "DOCKER-ENTRYPOINT: running: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 3 -V 16 -i $f";
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 3 -V 16 -i "$f"
+        echo "DOCKER-ENTRYPOINT: running: $f - COMPLETED";
+        echo
+    done
+
     echo "DOCKER-ENTRYPOINT: Startup Complete."
 
     echo "DOCKER-ENTRYPOINT: Attach and wait for exit"
     wait "$pid"
 else
     echo "DOCKER-ENTRYPOINT: MS SQL Server initialization already done. Simply starting the server!"
-    exec "$@"
+    /opt/mssql/bin/sqlservr
 fi
 
 echo "DOCKER-ENTRYPOINT: Completed!"
