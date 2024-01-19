@@ -36,10 +36,29 @@ process_init_file() {
 	case "$f" in
 		*.sh)     echo "$0: running $f"; . "$f" ;;
 		*.sql)    echo "$0: running $f"; "${sqlcmd[@]}" -i "$f"; echo ;;
-        *.bak)    echo "$0: restoring $f"; "${sqlcmd[@]}" -Q "RESTORE DATABASE [$(basename ${f/.bak/})] FROM DISK='$f'"; echo ;;
+        *.bak)    restore_backup "$f" ;;
 		*)        echo "$0: ignoring $f" ;;
 	esac
 	echo
+}
+
+restore_backup() {
+    local backup_file="$1"
+    local database_name=$(basename "$backup_file" .bak)
+    echo "$0: Restoring $database_name from $backup_file"
+
+    # Get logical file names from the backup file
+    # This permits backing up when the filepath is not default
+    file_list_result=$("${sqlcmd[@]}" -Q "RESTORE FILELISTONLY FROM DISK='$backup_file'")
+    out=( $(echo "$file_list_result" | grep -oP '^\s*\K\S+') )
+    data_logical_name=${out[2]}
+    log_logical_name=${out[3]}
+    data_file_path="/var/opt/mssql/${data_logical_name}_data.mdf"
+    log_file_path="/var/opt/mssql/${log_logical_name}.ldf"
+
+    # Perform the restore
+    "${sqlcmd[@]}" -Q "RESTORE DATABASE $database_name FROM DISK='$backup_file' \
+    WITH MOVE '$data_logical_name' TO '$data_file_path', MOVE '$log_logical_name' TO '$log_file_path'"
 }
 
 MSSQL_BASE=${MSSQL_BASE:-/var/opt/mssql}
