@@ -1,4 +1,4 @@
-ARG MSSQL_UPSTREAM_TAG=2019-GA-ubuntu-16.04
+ARG MSSQL_UPSTREAM_TAG=2019-CU24-ubuntu-20.04
 FROM mcr.microsoft.com/mssql/server:${MSSQL_UPSTREAM_TAG}
 LABEL maintainer "Kevin Collins <kcollins@purelinux.net>"
 
