@@ -10,9 +10,9 @@ jobs:
     strategy:
       matrix:
         build_target:
-          - 2017
-          - 2019
-          - 2022
+          - mssql-2017
+          - mssql-2019
+          - mssql-2022
     uses: thirdgen88/mssql-docker/.github/workflows/build.yml@main
     with:
       build_target: ${{ matrix.build_target }}
