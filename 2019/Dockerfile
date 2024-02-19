@@ -5,7 +5,8 @@ LABEL maintainer "Kevin Collins <kcollins@purelinux.net>"
 # Install some additional prerequisites
 USER root
 RUN apt-get update && \
-    apt-get install -y gettext pwgen
+    apt-get install -y gettext pwgen && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy in scripts
 COPY docker-entrypoint.sh /
