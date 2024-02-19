@@ -1,7 +1,8 @@
-# Supported tags and respective `Dockerfile` links
+# Supported tags
 
-* [`2017`, `2017-latest-ubuntu` (2017/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2017/Dockerfile)
-* [`2019`, `2019-latest`, `latest` (2019/Dockerfile)](https://github.com/thirdgen88/mssql-docker/blob/master/2019/Dockerfile)
+* `2017`, `2017-latest`
+* `2019`, `2019-latest`
+* `2022`, `2022-latest`, `latest`
 
 # Quick Reference
 
@@ -32,7 +33,7 @@ In order to run this image, you can follow the guidance listed in the [How to us
 
 To start a container named `sql1` with a new empty database named `test`, use the following:
 
-    $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=ch@nge_m3" \
+    $ docker run -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=ch@nge_m3" \
       -e "MSSQL_DATABASE=test" -e "MSSQL_USER=testuser" -e "MSSQL_PASSWORD=testpass" \
       --name sql1 kcollins/mssql:latest
 
@@ -59,20 +60,20 @@ services:
       - ./db-backups:/backups
       - ./db-init:/docker-entrypoint-initdb.d
     secrets:
-      - sa-password
+      - mssql-sa-password
       - mssql-password
     environment:
       # ACCEPT_EULA confirms your acceptance of the End-User Licensing Agreement.
       ACCEPT_EULA: Y
-      SA_PASSWORD_FILE: /run/secrets/sa-password
+      MSSQL_SA_PASSWORD_FILE: /run/secrets/mssql-sa-password
       MSSQL_DATABASE: test
       MSSQL_USER: testuser
       MSSQL_PASSWORD_FILE: /run/secrets/mssql-password
       MSSQL_PID: Developer  # Change to the edition you need, e.g. "Express", "Standard", etc.
 
 secrets:
-  sa-password:
-    file: ./secrets/SA_PASSWORD
+  mssql-sa-password:
+    file: ./secrets/MSSQL_SA_PASSWORD
   mssql-password:
     file: ./secrets/MSSQL_PASSWORD
 
@@ -82,7 +83,7 @@ volumes:
 
 The definition above has a few notable features:
 
-- The secrets functionality more closely mirrors what can be used with a Docker Swarm implementation.  All you need to do is create files such as `./secrets/SA_PASSWORD` containing a single line with the desired password.  The `SA_PASSWORD_FILE` environment variable contains the path to the secret file and will automatically be read and processed by the entrypoint script, ensuring that your passwords are not directly visible in environment variables within the container.
+- The secrets functionality more closely mirrors what can be used with a Docker Swarm implementation.  All you need to do is create files such as `./secrets/MSSQL_SA_PASSWORD` containing a single line with the desired password.  The `MSSQL_SA_PASSWORD_FILE` environment variable contains the path to the secret file and will automatically be read and processed by the entrypoint script, ensuring that your passwords are not directly visible in environment variables within the container.
 
 - The `db-init` bind-mount in the container allows you to place `.sql` or `.bak` files that will be processed on first-launch of the container.  Keep in mind that a `my_db.bak` file will be restored as database `[my_db]`, so pay attention to the `.bak` names you place here.  Any valid T-SQL files with a `.sql` extension will also be processed.
 
@@ -93,7 +94,7 @@ The definition above has a few notable features:
 Before you run under Docker Compose, lets make sure that you've created some prerequisite structures that won't be pre-existing in the GitHub repository:
 
     $ mkdir db-backups && mkdir db-init && mkdir secrets
-    $ echo ch@nge_m3 > secrets/SA_PASSWORD
+    $ echo ch@nge_m3 > secrets/MSSQL_SA_PASSWORD
     $ echo testpass > secrets/MSSQL_PASSWORD
 
 The above commands will create the necessary folders and preload the secrets files with passwords.  Feel free to change the password you place in those files based on your needs.
