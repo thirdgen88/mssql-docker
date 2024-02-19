@@ -3,6 +3,7 @@ on:
   schedule:
     # First day of every month at 8 am CST
     - cron: '0 14 1 * *'
+  workflow_dispatch:
 
 jobs:
   build_matrix:
