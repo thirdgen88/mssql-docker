@@ -6,16 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_matrix:
-    strategy:
-      matrix:
-        build_target:
-          - mssql-2017
-          - mssql-2019
-          - mssql-2022
+  build_all:
     uses: thirdgen88/mssql-docker/.github/workflows/build.yml@main
     with:
-      build_target: ${{ matrix.build_target }}
+      build_target: mssql
     secrets:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
