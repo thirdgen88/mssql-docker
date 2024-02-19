@@ -39,6 +39,7 @@ process_init_file() {
   local f="$1"; shift
   local sqlcmd=( "$@" )
   
+  # shellcheck disable=SC1090
   case "$f" in
       *.sh)     info "$0: running $f"; . "$f" ;;
       *.sql)    info "$0: running $f"; "${sqlcmd[@]}" -i "$f" ;;
