@@ -19,7 +19,7 @@ Kevin Collins
 `amd64`
 
 * **Source of this description**:
-https://github.com/thirdgen88/mssql-docker/tree/master/docs ([History](https://github.com/thirdgen88/mssql-docker/commits/master/docs))
+https://github.com/thirdgen88/mssql-docker/tree/main/docs ([History](https://github.com/thirdgen88/mssql-docker/commits/main/docs))
 
 # Overview
 
@@ -27,7 +27,7 @@ This Docker image builds on the base [Microsoft SQL Server Linux Image][mssql-hu
 
 # Getting Started
 
-In order to run this image, you can follow the guidance listed in the [How to use this Image][mssql-hub] section of the Microsoft Docker Hub Page.  There are some additional environment variables exposed by the custom [entrypoint](https://github.com/thirdgen88/mssql-docker/blob/master/2017/docker-entrypoint.sh) script that enable some enhanced functionality.  We'll take a look at some of those extended use-cases in this section.
+In order to run this image, you can follow the guidance listed in the [How to use this Image][mssql-hub] section of the Microsoft Docker Hub Page.  There are some additional environment variables exposed by the custom [entrypoint](https://github.com/thirdgen88/mssql-docker/blob/main/shared/docker-entrypoint.sh) script that enable some enhanced functionality.  We'll take a look at some of those extended use-cases in this section.
 
 ## Starting up with a new empty database
 
@@ -119,11 +119,11 @@ This image has built-in support for quick and easy backups.  Let's assume you ha
 
 At this point, you can take a backup from your host with a simple `docker exec` statement:
 
-    $ docker exec sql1 /backup.sh
+    $ docker exec sql1 backup.sh
 
 You can also specify the database to be backed up:
 
-    $ docker exec sql1 /backup.sh my_database
+    $ docker exec sql1 backup.sh my_database
 
 In your `./db-backups` folder, you'll have a nicely named file such as `my_database_20190120_044511.bak`.  You can specify a `RETAIN_FILES_COUNT=n` environment variable, where _n_ is the number of backup files to retain in the `/backups` folder in the container.  This can be helpful if you setup a cron task to periodically call the `backup.sh` script on a schedule.
 
@@ -146,7 +146,7 @@ In order to have the image provision a new empty database, you must specify all 
 
 # References
 
-There is a lot of useful information over at the [Microsoft Docs](https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-2017) page for working with the MSSQL Docker Image.  Take a look at that for more detailed information about managing the container and performing other administrative tasks.
+There is a lot of useful information over at the [Microsoft Docs](https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-linux-ver16&pivots=cs1-bash) page for working with the MSSQL Docker Image.  Take a look at that for more detailed information about managing the container and performing other administrative tasks.
 
 # License
 
@@ -158,5 +158,5 @@ As with all Docker images, these likely also contain other software which may be
 
 As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
 
-[docker-compose]: https://github.com/thirdgen88/mssql-docker/blob/master/docker-compose.yml "Docker Compose Example"
+[docker-compose]: https://github.com/thirdgen88/mssql-docker/blob/main/docker-compose.yml "Docker Compose Example"
 [mssql-hub]: https://hub.docker.com/_/microsoft-mssql-server
