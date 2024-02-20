@@ -18,7 +18,7 @@ COPY --chmod=0755 --chown=root:root \
 
 # Set a Simple Health Check
 HEALTHCHECK \
-    --interval=30s \
+    --interval=15s \
     --retries=3 \
     --start-period=10s \
     --timeout=3s \
