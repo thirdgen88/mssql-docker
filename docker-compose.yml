@@ -15,20 +15,20 @@ services:
         max-size: "200k"
         max-file: "10"
     secrets:
-      - sa-password
+      - mssql-sa-password
       - mssql-password
     environment:
       # ACCEPT_EULA confirms your acceptance of the End-User Licensing Agreement.
       ACCEPT_EULA: Y
-      SA_PASSWORD_FILE: /run/secrets/sa-password
+      MSSQL_SA_PASSWORD_FILE: /run/secrets/mssql-sa-password
       MSSQL_DATABASE: test
       MSSQL_USER: testuser
       MSSQL_PASSWORD_FILE: /run/secrets/mssql-password
       MSSQL_PID: Developer  # Change to the edition you need, e.g. "Express", "Standard", etc.
 
 secrets:
-  sa-password:
-    file: ./secrets/SA_PASSWORD
+  mssql-sa-password:
+    file: ./secrets/MSSQL_SA_PASSWORD
   mssql-password:
     file: ./secrets/MSSQL_PASSWORD
 
