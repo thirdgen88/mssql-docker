@@ -10,12 +10,14 @@ function main() {
     exit 1
   fi
 
-  export SQLCMDPASSWORD=${SA_PASSWORD:-$(< "${SA_PASSWORD_FILE}")}
+  declare SQLCMDPASSWORD
+  SQLCMDPASSWORD=${MSSQL_SA_PASSWORD:-$(< "${MSSQL_SA_PASSWORD_FILE}")}
+  export SQLCMDPASSWORD
 
   debug "Healthcheck query: ${health_check_query}, timeout: ${timeout_secs}."
 
   set +e
-  sqlcmd_output=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l ${timeout_secs} -t ${timeout_secs} -b -Q "${health_check_query}" 2>&1)
+  sqlcmd_output=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l "${timeout_secs}" -t "${timeout_secs}" -b -Q "${health_check_query}" 2>&1)
   exit_code=$?
   set -e
 
