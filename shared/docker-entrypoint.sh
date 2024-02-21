@@ -124,7 +124,6 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
   sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 )
 
   echo
-  ls /docker-entrypoint-initdb.d/ > /dev/null
   for f in /docker-entrypoint-initdb.d/*.bak /docker-entrypoint-initdb.d/*.sh /docker-entrypoint-initdb.d/*.sql; do
     process_init_file "$f" "${sqlcmd[@]}"
   done
