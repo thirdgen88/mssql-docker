@@ -135,7 +135,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
   if [ "${MSSQL_DATABASE}" ] && [ "${MSSQL_USER}" ] && [ "${MSSQL_PASSWORD}" ]; then
     info "Database healthy, proceeding with provisioning..."
     envsubst < "${MSSQL_PROVISIONING_FILE_TEMPLATE}" > "${MSSQL_PROVISIONING_FILE}"
-    if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -b -i "${MSSQL_PROVISIONING_FILE}"; then
+    if sqlcmd -S localhost -U sa -b -C -i "${MSSQL_PROVISIONING_FILE}"; then
       info "Provisioning completed, database [${MSSQL_DATABASE}] created."
       rm "${MSSQL_PROVISIONING_FILE}"
     else
