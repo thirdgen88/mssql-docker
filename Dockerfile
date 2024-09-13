@@ -24,9 +24,6 @@ HEALTHCHECK \
     --timeout=3s \
     CMD healthcheck.sh
 
-# Put CLI tools on the PATH
-ENV PATH /opt/mssql-tools/bin:$PATH
-
 # Setup a dedicated user for SQL Server (if missing), also set permissions on volume base
 ARG MSSQL_USERHOME=/home/mssql
 ARG MSSQL_UID=10001
@@ -44,7 +41,13 @@ RUN mkdir ${MSSQL_USERHOME} && \
     chown mssql:mssql /docker-entrypoint-initdb.d && \
     # Backup Folder
     mkdir /backups && \
-    chown mssql:mssql /backups
+    chown mssql:mssql /backups && \
+    # Workaround upstream placement of mssql-tools
+    find /opt -maxdepth 1 -regextype egrep -regex "/opt/mssql-tools[0-9]+" -type d -print0 -quit | xargs -0 -i ln -s {} /opt/mssql-tools && \
+    sqlcmd -? | head -n 3
+
+# Put CLI tools on the PATH
+ENV PATH /opt/mssql-tools/bin:$PATH
 
 # Return to mssql user
 USER mssql

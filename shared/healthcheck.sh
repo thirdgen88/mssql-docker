@@ -17,7 +17,7 @@ function main() {
   debug "Healthcheck query: ${health_check_query}, timeout: ${timeout_secs}."
 
   set +e
-  sqlcmd_output=$(/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l "${timeout_secs}" -t "${timeout_secs}" -b -Q "${health_check_query}" 2>&1)
+  sqlcmd_output=$(sqlcmd -S localhost -U sa -l "${timeout_secs}" -t "${timeout_secs}" -b -C -Q "${health_check_query}" 2>&1)
   exit_code=$?
   set -e
 
