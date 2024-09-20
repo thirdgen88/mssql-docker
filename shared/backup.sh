@@ -16,8 +16,8 @@ BACKUP_FILE="${BACKUP_TARGET}/${DATABASE_TARGET}_$(date +%Y%m%d_%H%M%S).bak"
 
 # Perform Database Backup
 echo "Initating backup of database [${DATABASE_TARGET}] to ${BACKUP_FILE}"
-/opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa \
+sqlcmd \
+  -S localhost -U sa -C \
   -Q "BACKUP DATABASE [${DATABASE_TARGET}] TO DISK = N'${BACKUP_FILE}' WITH NOFORMAT, NOINIT, NAME = '${DATABASE_TARGET}-full', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 
 chmod 640 "${BACKUP_FILE}"

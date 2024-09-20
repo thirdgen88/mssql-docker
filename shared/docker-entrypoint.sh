@@ -110,7 +110,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
 
   # Wait up to 60 seconds for database initialization to complete
   for ((i=${MSSQL_STARTUP_DELAY:=60};i>0;i--)); do
-    if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -l 1 -t 1 -b -Q "SELECT 1" &> /dev/null; then
+    if sqlcmd -S localhost -U sa -l 1 -t 1 -b -C -Q "SELECT 1" &> /dev/null; then
       break
     fi
     sleep 1
@@ -121,7 +121,7 @@ if [ ! -f "${MSSQL_BASE}/.docker-init-complete" ]; then
   fi
 
   # Set SQLCMD command string for additional initialization file processing
-  sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 )
+  sqlcmd=( sqlcmd -S localhost -U sa -l 3 -V 16 -C )
 
   echo
   for f in /docker-entrypoint-initdb.d/*.bak /docker-entrypoint-initdb.d/*.sh /docker-entrypoint-initdb.d/*.sql; do
