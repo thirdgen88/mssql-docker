@@ -8,10 +8,15 @@ RUN apt-get update && \
     apt-get install -y gettext pwgen && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy in scripts
-COPY docker-entrypoint.sh /usr/local/bin/
-COPY --chmod=0664 --chown=1000:1000 setup.sql restore.sql /opt/mssql/etc/
+# Copy in scripts.  Use 1000:1000 ownership to align with upstream MSSQL image (reasons for this choice upstream unclear)
+RUN mkdir -p /opt/mssql/etc && \
+    chown 1000:1000 /opt/mssql/etc
+COPY --chmod=0664 --chown=1000:1000 \
+    setup.sql \
+    restore.sql \
+    /opt/mssql/etc/
 COPY --chmod=0755 --chown=root:root \
+    docker-entrypoint.sh \
     healthcheck.sh \
     backup.sh \
     /usr/local/bin/
