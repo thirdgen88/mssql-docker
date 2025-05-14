@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y gettext pwgen && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy in scripts
+# Copy in scripts.  Use 1000:1000 ownership to align with upstream MSSQL image (reasons for this choice upstream unclear)
 RUN mkdir -p /opt/mssql/etc && \
     chown 1000:1000 /opt/mssql/etc
 COPY --chmod=0664 --chown=1000:1000 \
